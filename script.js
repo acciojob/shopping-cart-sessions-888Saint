@@ -1,4 +1,4 @@
-// Product data
+// 🛒 **Product Data**
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -7,29 +7,21 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements
+// 🖥️ **DOM Elements**
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Initialize cart from sessionStorage or start with an empty array
+// 🧠 **Initialize Cart**
 let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-// Ensure cart is valid (prevent corruption or invalid structure)
+// Validate session storage integrity
 if (!Array.isArray(cart)) {
   cart = [];
   updateCartInSessionStorage();
 }
 
-// Clear session storage if it's invalid
-function initializeSessionStorage() {
-  if (!Array.isArray(cart)) {
-    sessionStorage.removeItem("cart");
-    cart = [];
-  }
-}
-
-// Render product list
+// 📝 **Render Product List**
 function renderProducts() {
   productList.innerHTML = "";
   products.forEach((product) => {
@@ -49,7 +41,7 @@ function renderProducts() {
   });
 }
 
-// Render cart list
+// 🛍️ **Render Cart**
 function renderCart() {
   cartList.innerHTML = "";
   if (cart.length === 0) {
@@ -74,12 +66,13 @@ function renderCart() {
   });
 }
 
-// Add item to cart
+// ➕ **Add Item to Cart**
 function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
   if (!product) return;
 
-  if (cart.some((item) => item.id === productId)) {
+  const exists = cart.some((item) => item.id === productId);
+  if (exists) {
     alert("This product is already in your cart.");
     return;
   }
@@ -89,31 +82,42 @@ function addToCart(productId) {
   renderCart();
 }
 
-// Remove item from cart
+// ➖ **Remove Item from Cart**
 function removeFromCart(productId) {
   cart = cart.filter((item) => item.id !== productId);
   updateCartInSessionStorage();
   renderCart();
 }
 
-// Clear cart
+// 🧹 **Clear Cart**
 function clearCart() {
   cart = [];
   updateCartInSessionStorage();
   renderCart();
 }
 
-// Update session storage with current cart
+// 💾 **Update Session Storage**
 function updateCartInSessionStorage() {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Clear cart on load if invalid session storage
-initializeSessionStorage();
+// Clear cart if invalid data exists in sessionStorage
+function validateSessionStorage() {
+  const storedCart = sessionStorage.getItem("cart");
+  try {
+    const parsedCart = JSON.parse(storedCart);
+    if (!Array.isArray(parsedCart)) {
+      throw new Error("Invalid cart data");
+    }
+  } catch {
+    sessionStorage.removeItem("cart");
+  }
+}
 
-// Event Listener for Clear Cart button
+// Event Listener for Clear Cart Button
 clearCartBtn.addEventListener("click", clearCart);
 
-// Initial render
+// Validate and initialize cart
+validateSessionStorage();
 renderProducts();
 renderCart();
