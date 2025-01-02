@@ -12,7 +12,7 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Retrieve cart from session storage or initialize an empty array
+// Initialize cart from sessionStorage or start empty
 let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
 // Ensure cart is valid
@@ -23,7 +23,7 @@ if (!Array.isArray(cart)) {
 
 // Render product list
 function renderProducts() {
-  productList.innerHTML = ""; // Clear list before rendering
+  productList.innerHTML = "";
   products.forEach((product) => {
     const li = document.createElement("li");
     li.innerHTML = `
@@ -44,7 +44,7 @@ function renderProducts() {
 
 // Render cart list
 function renderCart() {
-  cartList.innerHTML = ""; // Clear cart before rendering
+  cartList.innerHTML = "";
   if (cart.length === 0) {
     cartList.innerHTML = "<li>Your cart is empty.</li>";
     return;
@@ -73,9 +73,8 @@ function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
   if (!product) return;
 
-  // Prevent duplicate entries
-  const existingItem = cart.find((item) => item.id === productId);
-  if (existingItem) {
+  const exists = cart.some((item) => item.id === productId);
+  if (exists) {
     alert("This product is already in your cart.");
     return;
   }
@@ -104,13 +103,13 @@ function updateCartInSessionStorage() {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Event Listener for Clear Cart button
-clearCartBtn.addEventListener("click", clearCart);
-
-// Clear cart on page load if sessionStorage is invalid
+// Clear invalid session storage on page load
 if (!Array.isArray(cart)) {
   clearCart();
 }
+
+// Event Listener for Clear Cart button
+clearCartBtn.addEventListener("click", clearCart);
 
 // Initial render
 renderProducts();
