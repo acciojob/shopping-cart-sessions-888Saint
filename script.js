@@ -12,13 +12,21 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Initialize cart from sessionStorage or start empty
+// Initialize cart from sessionStorage or start with an empty array
 let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-// Ensure cart is valid
+// Ensure cart is valid (prevent corruption or invalid structure)
 if (!Array.isArray(cart)) {
   cart = [];
   updateCartInSessionStorage();
+}
+
+// Clear session storage if it's invalid
+function initializeSessionStorage() {
+  if (!Array.isArray(cart)) {
+    sessionStorage.removeItem("cart");
+    cart = [];
+  }
 }
 
 // Render product list
@@ -33,7 +41,6 @@ function renderProducts() {
     productList.appendChild(li);
   });
 
-  // Add event listeners to all 'Add to Cart' buttons
   document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
     button.addEventListener("click", (e) => {
       const productId = parseInt(e.target.getAttribute("data-id"));
@@ -59,7 +66,6 @@ function renderCart() {
     cartList.appendChild(li);
   });
 
-  // Add event listeners to all 'Remove' buttons
   document.querySelectorAll(".remove-from-cart-btn").forEach((button) => {
     button.addEventListener("click", (e) => {
       const productId = parseInt(e.target.getAttribute("data-id"));
@@ -73,8 +79,7 @@ function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
   if (!product) return;
 
-  const exists = cart.some((item) => item.id === productId);
-  if (exists) {
+  if (cart.some((item) => item.id === productId)) {
     alert("This product is already in your cart.");
     return;
   }
@@ -103,10 +108,8 @@ function updateCartInSessionStorage() {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Clear invalid session storage on page load
-if (!Array.isArray(cart)) {
-  clearCart();
-}
+// Clear cart on load if invalid session storage
+initializeSessionStorage();
 
 // Event Listener for Clear Cart button
 clearCartBtn.addEventListener("click", clearCart);
